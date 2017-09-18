@@ -1,5 +1,7 @@
 package com.example.david.boxoffice.api;
 
+import com.example.david.boxoffice.model.MoviesResponse;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
