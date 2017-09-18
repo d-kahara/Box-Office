@@ -2,20 +2,32 @@ package com.example.david.boxoffice;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.david.boxoffice.model.Movie;
 
-import static android.R.attr.rating;
 
 /**
  * Created by david on 9/18/17.
  */
 
-public class DetailActivity {
+public class DetailActivity extends AppCompatActivity {
+    TextView nameOfMovie, plotSynopsis, userRating, releaseDate;
+    ImageView imageView;
+    private RecyclerView recyclerView;
+
+
+    private final AppCompatActivity activity = DetailActivity.this;
+
+    Movie movie;
+    String thumbnail, movieName, synopsis, rating, dateOfRelease;
+    int movie_id;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
