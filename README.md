@@ -23,10 +23,10 @@ jdk 8+
 git clone 'https://github.com/d-kahara/Box-Office'
 gradle sync
 ```
-####App's home screen
+#### App's home screen
 ![Imgur](https://i.imgur.com/hIbh8xH.png)
 
-####Movie Detail Activity
+#### Movie Detail Activity
 ![Imgur](https://i.imgur.com/CJZhSzC.png)
 
 
