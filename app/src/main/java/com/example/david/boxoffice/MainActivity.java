@@ -12,8 +12,11 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.david.boxoffice.adapters.MoviesAdapter;
 import com.example.david.boxoffice.api.Client;
 import com.example.david.boxoffice.api.Service;
 import com.example.david.boxoffice.model.Movie;
@@ -126,20 +129,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.menu_settings:
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_settings:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-}
