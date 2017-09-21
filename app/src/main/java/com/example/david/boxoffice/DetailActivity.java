@@ -25,7 +25,6 @@ public class DetailActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
 
 
-    private final AppCompatActivity activity = DetailActivity.this;
 
     Movie movie;
     String thumbnail, movieName, synopsis, rating, dateOfRelease;
@@ -46,6 +45,8 @@ public class DetailActivity extends AppCompatActivity {
         plotSynopsis = (TextView) findViewById(R.id.plotsynopsis);
         userRating = (TextView) findViewById(R.id.userrating);
         releaseDate = (TextView) findViewById(R.id.releasedate);
+
+//Check if the intent from the main activity has extras and them to the current activity.
 
         Intent intentThatStartedThisActivity = getIntent();
         if (intentThatStartedThisActivity.hasExtra("movies")) {
@@ -77,6 +78,8 @@ public class DetailActivity extends AppCompatActivity {
 
 
     }
+
+//This method creates the collapsing toolbar layout specified in the  activity_detail.xml layout resource
     private void initCollapsingToolbar() {
         final CollapsingToolbarLayout collapsingToolbarLayout =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -89,6 +92,8 @@ public class DetailActivity extends AppCompatActivity {
             int scrollRange = -1;
 
             @Override
+
+//Sets A title for the movie details when image is scrolled out of view
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 if (scrollRange == -1) {
                     scrollRange = appBarLayout.getTotalScrollRange();
