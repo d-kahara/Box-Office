@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private List<Movie> movieList;
     ProgressDialog pd;
     private SwipeRefreshLayout swipeContainer;
-    public static final String TAG = MoviesAdapter.class.getSimpleName();
 
 
     @Override
@@ -43,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//This method initializes the views i.e movie cards
         initViews();
 
+//This allows for swiping down to refresh the movies list
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.main_content);
         swipeContainer.setColorSchemeResources(android.R.color.holo_orange_dark);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -68,16 +69,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void initViews() {
+//Setting a progress Dialog
         pd = new ProgressDialog(this);
         pd.setMessage("Fetching Movies....");
         pd.setCancelable(false);
         pd.show();
 
+
+//Binds the recycler view to the view
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
+//Initializing the movies array list and the adapter
         movieList = new ArrayList<>();
         adapter = new MoviesAdapter(this, movieList);
 
+//Setting up the gridlayout with regards to the device's orientation
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         } else {
@@ -85,13 +91,15 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+//Setup animations for the recycler view
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
         loadJSON();
     }
 
+
+//This method does the heavy lifting.Making the network calls to the service and processing the response
     private void loadJSON() {
         try {
             if (BuildConfig.MOVIE_DB_API_KEY.isEmpty()) {
