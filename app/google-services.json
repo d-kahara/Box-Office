@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "150149404332",
+    "firebase_url": "https://boxoffice-2f171.firebaseio.com",
+    "project_id": "boxoffice-2f171",
+    "storage_bucket": "boxoffice-2f171.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150149404332:android:821d0f34ce7a21c3",
+        "android_client_info": {
+          "package_name": "com.example.david.cinemax"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "150149404332-h8ps3m9pvpbm6kgmcqv3dcjb1ho1ka2j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.david.cinemax",
+            "certificate_hash": "ead9a07b255db30849d2f8400536103a4d7dbbba"
+          }
+        },
+        {
+          "client_id": "150149404332-p01bn2ttr4msaivgj9feu0ml5v93kovj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4hG-sgwRcTzYyocImhKnezYjVmHBUMrA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150149404332-p01bn2ttr4msaivgj9feu0ml5v93kovj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
