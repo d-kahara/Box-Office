@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//This method does the heavy lifting.Making the network calls to the service and processing the response
+    //This method does the heavy lifting.Making the network calls to the service and processing the response
     private void loadJSON() {
         try {
             if (BuildConfig.MOVIE_DB_API_KEY.isEmpty()) {
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
     }
-
+//
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
 //            default:
 //                return super.onOptionsItemSelected(item);
 //        }
+//
+//    }
 
-    }
-
+}
