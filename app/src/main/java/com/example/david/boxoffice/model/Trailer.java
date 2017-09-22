@@ -12,23 +12,24 @@ public class Trailer {
     @SerializedName("name")
     private String name;
 
-    public Trailer(String key, String name){
+    public Trailer(String key, String name) {
         this.key = key;
         this.name = name;
     }
 
-    public String getKey(){
+    public String getKey() {
         return key;
     }
 
-    public void setKey(String key){
+    public void setKey(String key) {
         this.key = key;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
+}
