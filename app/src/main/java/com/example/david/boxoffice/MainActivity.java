@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //This method returns the activity upon which it is called with regards to the context
     public Activity getActivity() {
         Context context = this;
         while (context instanceof ContextWrapper) {
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     //This method does the heavy lifting.Making the network calls to the service and processing the response
+    //It loads popular movies
     private void loadJSON() {
         try {
             if (BuildConfig.MOVIE_DB_API_KEY.isEmpty()) {
@@ -107,9 +109,13 @@ public class MainActivity extends AppCompatActivity {
                 pd.dismiss();
             }
 
+//instantiate the client
+            Client Client = new Client();
 
-            Client client = new Client();
+//Implement the Service
             Service apiService = Client.getClient().create(Service.class);
+
+//Make a network call
             Call<MoviesResponse> call = apiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY);
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
@@ -136,22 +142,66 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
     }
-//
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.menu_settings:
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//
-//    }
+
+//Second network call to load top Rated movies
+    private void loadJSON2() {
+        try {
+            if (BuildConfig.MOVIE_DB_API_KEY.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "Please get API key", Toast.LENGTH_SHORT);
+                pd.dismiss();
+            }
+
+//instantiate the client
+            Client Client = new Client();
+
+//Implement the Service
+            Service apiService = Client.getClient().create(Service.class);
+
+//Make a network call
+            Call<MoviesResponse> call = apiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY);
+            call.enqueue(new Callback<MoviesResponse>() {
+                @Override
+                public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
+                    List<Movie> movies = response.body().getResults();
+
+                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+                    recyclerView.smoothScrollToPosition(0);
+                    if (swipeContainer.isRefreshing()) {
+                        swipeContainer.setRefreshing(false);
+                    }
+                    pd.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<MoviesResponse> call, Throwable t) {
+                    Log.d("Error", t.getMessage());
+                    Toast.makeText(MainActivity.this, "Error fetching Data", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (Exception e) {
+            Log.d("Error", e.getMessage());
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
 
 }
