@@ -5,4 +5,6 @@ package com.example.david.boxoffice;
  */
 
 public class Constants {
+    public static final String PREFERENCES_MOVIE_KEY = "movie";
+
 }
