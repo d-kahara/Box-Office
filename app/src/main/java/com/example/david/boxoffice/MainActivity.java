@@ -30,6 +30,7 @@ import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity  {
     private static final String TAG = MainActivity.class.getSimpleName() ;
     private RecyclerView recyclerView;
     private MoviesAdapter adapter;
@@ -86,6 +87,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Toast.makeText(MainActivity.this, "Movies Refreshed", Toast.LENGTH_SHORT).show();
             }
         });
+
+        //Creating shared Preferences for Recently searched movies
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mRecentMovies = mSharedPreferences.getString(Constants.PREFERENCES_MOVIE_KEY, null);
+
+        if (mRecentMovies != null) {
+            getMovie(mRecentMovies);
+        }
     }
 
     @Override
@@ -153,7 +162,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
-        checkSortOrder();
+
+        loadJSON();
     }
 
 
@@ -199,62 +209,52 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    //Second network call to load top Rated movies
-    private void loadJSON2() {
-        try {
-            if (BuildConfig.MOVIE_DB_API_KEY.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Please get API key", Toast.LENGTH_SHORT);
-                pd.dismiss();
-            }
 
-        //instantiate the client
-            Client Client = new Client();
-
-        //Implement the Service
-            Service apiService = Client.getClient().create(Service.class);
-
-        //Make a network call
-            Call<MoviesResponse> call = apiService.getTopRatedMovies(BuildConfig.MOVIE_DB_API_KEY);
-            call.enqueue(new Callback<MoviesResponse>() {
-                @Override
-                public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
-                    List<Movie> movies = response.body().getResults();
-
-                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
-                    recyclerView.smoothScrollToPosition(0);
-                    if (swipeContainer.isRefreshing()) {
-                        swipeContainer.setRefreshing(false);
-                    }
-                    pd.dismiss();
-                }
-
-                @Override
-                public void onFailure(Call<MoviesResponse> call, Throwable t) {
-                    Log.d("Error", t.getMessage());
-                    Toast.makeText(MainActivity.this, "Error fetching Data", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        } catch (Exception e) {
-            Log.d("Error", e.getMessage());
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
-        }
-    }
 
 
     //Creates the overflow menu to change preferences
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        MaterialSearchView searchView = (MaterialSearchView) findViewById(R.id.search_view);
+
+        searchView.setMenuItem(item);
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Do some magic
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //Do some magic
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+            }
+        });
+
         return true;
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_settings:
-                Intent intent = new Intent(this, OptionsActivity.class);
-                startActivity(intent);
+
             case  R.id.menu_sign_out:
                     AuthUI.getInstance().signOut(this)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -269,6 +269,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                                     finish();
                                 }
                             });
+            case R.id.menu_popular:
+                Intent intent = new Intent(MainActivity.this, PopularActivity.class);
+                startActivity(intent);
 
                 return true;
             default:
@@ -277,41 +280,5 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
 
     }
-
-    //If shared preferences change the checkSort Order method is called
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s){
-        Log.d(TAG, "Preferences updated");
-        checkSortOrder();
-    }
-
-
-    //This method checks the previously saved Shared preference and calls the relevant method
-    private void checkSortOrder(){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String sortOrder = preferences.getString(
-                this.getString(R.string.pref_sort_order_key),
-                this.getString(R.string.pref_most_popular)
-        );
-        if (sortOrder.equals(this.getString(R.string.pref_most_popular))) {
-            Log.d(TAG, "Sorting by most popular");
-            loadJSON();
-        } else {
-            Log.d(TAG, "Sorting by Top Rated");
-            loadJSON2();
-        }
-    }
-
-
-    //The on resume method is invoked to check whether there was a previous network call that populated the movielist
-//    @Override
-//    public void onResume(){
-//        super.onResume();
-//        if (movieList.isEmpty()){
-//            checkSortOrder();
-//        }else{
-//
-//        }
-//    }
 
 }
