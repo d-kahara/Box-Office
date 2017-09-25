@@ -17,6 +17,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -46,6 +47,9 @@ public class MainActivity extends AppCompatActivity  {
     private List<Movie> movieList;
     ProgressDialog pd;
     private SwipeRefreshLayout swipeContainer;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private String mRecentMovies;
 
     private static final int SIGN_IN_REQUEST_CODE = 10;
     //private FirebaseListAdapter<Movie> adapter;
@@ -72,9 +76,9 @@ public class MainActivity extends AppCompatActivity  {
                             .getDisplayName(),
                     Toast.LENGTH_LONG)
                     .show();
-
-        //This method initializes the views i.e movie cards
             initViews();
+
+
         }
 
         //This allows for swiping down to refresh the movies list
@@ -83,19 +87,35 @@ public class MainActivity extends AppCompatActivity  {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                initViews();
-                Toast.makeText(MainActivity.this, "Movies Refreshed", Toast.LENGTH_SHORT).show();
+                if (mRecentMovies != null) {
+                    loadJSON(mRecentMovies);
+                } else {
+                    Toast.makeText(MainActivity.this, "Please Enter the Name of a movie in the search Bar", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
 
+
+   }
+
+    @Override
+    public void onResume(){
+        super.onResume();
         //Creating shared Preferences for Recently searched movies
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mRecentMovies = mSharedPreferences.getString(Constants.PREFERENCES_MOVIE_KEY, null);
-
+        initViews();
         if (mRecentMovies != null) {
-            getMovie(mRecentMovies);
+            loadJSON(mRecentMovies);
+        } else {
+            Toast.makeText(MainActivity.this, "Please Enter the Name of a movie in the search Bar", Toast.LENGTH_LONG).show();
+            if (swipeContainer.isRefreshing()) {
+                swipeContainer.setRefreshing(false);
+            }
         }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
@@ -105,10 +125,22 @@ public class MainActivity extends AppCompatActivity  {
         if(requestCode == SIGN_IN_REQUEST_CODE) {
             if(resultCode == RESULT_OK) {
                 Toast.makeText(this,
-                        "Successfully signed in. Welcome!",
-                        Toast.LENGTH_LONG)
-                        .show();
+                        "Successfully signed in. Welcome!",Toast.LENGTH_LONG).show();
+
                 initViews();
+                //Creating shared Preferences for Recently searched movies
+                mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                mRecentMovies = mSharedPreferences.getString(Constants.PREFERENCES_MOVIE_KEY, null);
+
+                if (mRecentMovies != null) {
+                    loadJSON(mRecentMovies);
+                } else {
+                    Toast.makeText(MainActivity.this, "Please Enter the Name of a movie in the search Bar", Toast.LENGTH_LONG).show();
+                    if (swipeContainer.isRefreshing()) {
+                        swipeContainer.setRefreshing(false);
+                    }
+                }
+
             } else {
                 Toast.makeText(this,
                         "We couldn't sign you in. Please try again later.",
@@ -137,12 +169,12 @@ public class MainActivity extends AppCompatActivity  {
     public void initViews() {
         //Setting a progress Dialog
         pd = new ProgressDialog(this);
-        pd.setMessage("Fetching Movies....");
+        pd.setMessage("Fetching....");
         pd.setCancelable(false);
-        pd.show();
 
 
-        //Binds the recycler view to the view
+
+        //Binds the recycler view to the resource
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         //Initializing the movies array list and the adapter
@@ -163,13 +195,13 @@ public class MainActivity extends AppCompatActivity  {
         adapter.notifyDataSetChanged();
 
 
-        loadJSON();
+
     }
 
 
     //This method does the heavy lifting.Making the network calls to the service and processing the response
-    //It loads popular movies
-    private void loadJSON() {
+    //It loads the movie entry made
+    private void loadJSON(String movie) {
         try {
             if (BuildConfig.MOVIE_DB_API_KEY.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "Please get API key", Toast.LENGTH_SHORT);
@@ -182,7 +214,7 @@ public class MainActivity extends AppCompatActivity  {
             Service apiService = Client.getClient().create(Service.class);
 
         //Make a network call
-            Call<MoviesResponse> call = apiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY);
+            Call<MoviesResponse> call = apiService.getMovie(movie, BuildConfig.MOVIE_DB_API_KEY);
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
@@ -216,15 +248,23 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+
+
+        MaterialSearchView searchView = (MaterialSearchView) findViewById(R.id.search_view);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mEditor = mSharedPreferences.edit();
 
         MenuItem item = menu.findItem(R.id.action_search);
-        MaterialSearchView searchView = (MaterialSearchView) findViewById(R.id.search_view);
+
 
         searchView.setMenuItem(item);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //Do some magic
+                addToSharedPreferences(query);
+                loadJSON(query);
+
                 return false;
             }
 
@@ -254,6 +294,11 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_popular:
+                Intent intent = new Intent(MainActivity.this, PopularActivity.class);
+                startActivity(intent);
+                return true;
+
 
             case  R.id.menu_sign_out:
                     AuthUI.getInstance().signOut(this)
@@ -269,9 +314,7 @@ public class MainActivity extends AppCompatActivity  {
                                     finish();
                                 }
                             });
-            case R.id.menu_popular:
-                Intent intent = new Intent(MainActivity.this, PopularActivity.class);
-                startActivity(intent);
+
 
                 return true;
             default:
@@ -280,5 +323,10 @@ public class MainActivity extends AppCompatActivity  {
 
 
     }
+
+    private void addToSharedPreferences(String movie) {
+        mEditor.putString(Constants.PREFERENCES_MOVIE_KEY, movie).apply();
+    }
+
 
 }
