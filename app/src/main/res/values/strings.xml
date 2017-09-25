@@ -11,6 +11,8 @@
     <string name="pref_most_popular">Most Popular</string>
     <string name="pref_highest_rated">Highest Rated</string>
     <string name="trailer">Trailer</string>
+    <string name="facebook_app_id">133793990590969</string>
+    <string name="fb_login_protocol_scheme">fb133793990590969</string>
 
 
 
